@@ -1,0 +1,1017 @@
+`html
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Juego educativo: Ciberseguridad, IA y Derechos Digitales</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --bg: #f4f7ff;
+      --primary: #2563eb;
+      --secondary: #f97316;
+      --success: #16a34a;
+      --error: #dc2626;
+      --country: #bfdbfe;
+      --problem: #fecaca
+      --text: #111827;
+      --card-radius: 10px;
+      --transition-fast: 0.2s;
+    }
+I'm 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #e0f2fe, #f4f7ff);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: white;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.1);
+      padding: 0.6rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header .left,
+    header .right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .timer {
+      font-weight: 700;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 999px;
+      padding: 0.4rem 0.9rem;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      box-shadow: 0 2px 4px rgba(37, 99, 235, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--secondary);
+      color: white;
+      box-shadow: 0 2px 4px rgba(249, 115, 22, 0.4);
+    }
+
+    .btn-ghost {
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 3px 6px rgba(15, 23, 42, 0.2);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+      box-shadow: none;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .screen {
+      display: none;
+      animation: fadeIn 0.4s ease;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .title {
+      text-align: center;
+      margin: 1rem 0 0.5rem;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: #1f2937;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin-bottom: 1.2rem;
+      color: #4b5563;
+      font-size: 0.95rem;
+    }
+
+    .start-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.8rem;
+      align-items: center;
+      margin-top: 1.5rem;
+    }
+
+    .start-buttons .btn {
+      width: min(260px, 100%);
+      justify-content: center;
+      font-size: 1rem;
+      padding: 0.7rem 1rem;
+    }
+
+    .info-pill {
+      margin: 0.5rem auto 0;
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      background: rgba(37, 99, 235, 0.08);
+      color: #1d4ed8;
+      font-size: 0.8rem;
+      width: fit-content;
+    }
+
+    / Easy level layout /
+    .easy-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 0.7rem;
+      margin-top: 1rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: var(--card-radius);
+      padding: 0.7rem;
+      min-height: 70px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast), opacity 0.4s ease;
+    }
+
+    .card.country {
+      background: var(--country);
+    }
+
+    .card.problem {
+      background: var(--problem);
+    }
+
+    .card.selected {
+      outline: 3px solid #facc15;
+      transform: translateY(-2px);
+    }
+
+    .card.correct {
+      background: #bbf7d0 !important;
+    }
+
+    .card.wrong {
+      background: #fecaca !important;
+    }
+
+    .card.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .placeholder {
+      border-radius: var(--card-radius);
+      border: 2px dashed #d1d5db;
+      min-height: 70px;
+    }
+
+    / Difficult (memory) layout /
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(70px, 1fr));
+      gap: 0.6rem;
+      margin-top: 1rem;
+    }
+
+    .memory-card {
+      position: relative;
+      width: 100%;
+      padding-top: 120%;
+      perspective: 800px;
+      cursor: pointer;
+    }
+
+    .memory-inner {
+      position: absolute;
+      inset: 0;
+      transition: transform 0.4s;
+      transform-style: preserve-3d;
+    }
+
+    .memory-card.flipped .memory-inner {
+      transform: rotateY(180deg);
+    }
+
+    .memory-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: var(--card-radius);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.4rem;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(15, 23, 42, 0.1);
+    }
+
+    .memory-front {
+      background: linear-gradient(135deg, #6366f1, #ec4899);
+      color: white;
+    }
+
+    .memory-back {
+      background: white;
+      transform: rotateY(180deg);
+    }
+
+    .memory-back.country {
+      background: var(--country);
+    }
+
+    .memory-back.problem {
+      background: var(--problem);
+    }
+
+    .memory-card.matched .memory-inner {
+      transform: rotateY(180deg);
+    }
+
+    .memory-card.matched .memory-back {
+      background: #bbf7d0 !important;
+    }
+
+    / Modals /
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 30;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 1.2rem 1.4rem;
+      max-width: 420px;
+      width: 92%;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+      animation: scaleIn 0.25s ease;
+    }
+
+    .modal h2 {
+      font-size: 1.1rem;
+      margin-bottom: 0.4rem;
+    }
+
+    .modal p {
+      font-size: 0.9rem;
+      margin-bottom: 0.8rem;
+      color: #4b5563;
+    }
+
+    .modal input[type="text"] {
+      width: 100%;
+      padding: 0.45rem 0.6rem;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      margin-bottom: 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .modal-buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    / Ranking /
+    .ranking-list {
+      margin-top: 0.5rem;
+      max-height: 200px;
+      overflow-y: auto;
+      border-radius: 10px;
+      border: 1px solid #e5e7eb;
+      padding: 0.4rem;
+      background: #f9fafb;
+    }
+
+    .ranking-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.25rem 0.4rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+    }
+
+    .ranking-item:nth-child(1) {
+      background: rgba(34, 197, 94, 0.12);
+      font-weight: 700;
+    }
+
+    .ranking-item:nth-child(2) {
+      background: rgba(59, 130, 246, 0.08);
+    }
+
+    .ranking-item:nth-child(3) {
+      background: rgba(234, 179, 8, 0.12);
+    }
+
+    .ranking-name {
+      max-width: 60%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .ranking-time {
+      font-variant-numeric: tabular-nums;
+    }
+
+    / Utility /
+    .hidden {
+      display: none !important;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes scaleIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @media (max-width: 640px) {
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+      }
+      .memory-grid {
+        grid-template-columns: repeat(3, minmax(80px, 1fr));
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="left">
+      <span class="timer" id="timer">Tiempo: 0 s</span>
+      <span style="font-size:0.8rem;color:#6b7280;">⏱️ Penalización +10 s por fallo</span>
+    </div>
+    <div class="right">
+      <button class="btn btn-ghost" id="btnHome">Inicio</button>
+      <button class="btn btn-secondary" id="btnRestart">Reiniciar nivel</button>
+      <button class="btn btn-primary" id="btnHardTop">Nivel difícil (Memory)</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="container">
+      <!-- Pantalla inicial -->
+      <section id="screenStart" class="screen active">
+        <h1 class="title">Juego Digital Europa</h1>
+        <p class="subtitle">
+          Relaciona países europeos con problemas digitales: ciberseguridad, adicción al móvil, derechos digitales y más.
+        </p>
+        <div class="info-pill">
+          🎯 Objetivo: ¡Termina lo más rápido posible y entra en el ranking!
+        </div>
+        <div class="start-buttons">
+          <button class="btn btn-primary" id="btnEasyStart">Nivel fácil (parejas visibles)</button>
+          <button class="btn btn-secondary" id="btnHardStart">Nivel difícil (Memory)</button>
+        </div>
+      </section>
+
+      <!-- Nivel fácil -->
+      <section id="screenEasy" class="screen">
+        <h2 class="title">Nivel fácil</h2>
+        <p class="subtitle">
+          Une cada <strong>país</strong> (azul) con su <strong>problema digital</strong> (rojo). Solo hay 5 parejas en pantalla.
+        </p>
+        <div class="easy-grid" id="easyGrid">
+          <!-- Tarjetas generadas por JS -->
+        </div>
+      </section>
+
+      <!-- Nivel difícil (Memory) -->
+      <section id="screenHard" class="screen">
+        <h2 class="title">Nivel difícil (Memory)</h2>
+        <p class="subtitle">
+          Todas las tarjetas están boca abajo. Encuentra las parejas país + problema digital.
+        </p>
+        <div class="memory-grid" id="memoryGrid">
+          <!-- Tarjetas generadas por JS -->
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal genérico -->
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal" id="modalContent">
+      <!-- Contenido generado por JS -->
+    </div>
+  </div>
+
+  <!-- Sonidos (base64 muy simples) -->
+  <audio id="soundCorrect">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAAA//8AAP//AAD//wAA//8AAP//AAD//wAA" type="audio/wav">
+  </audio>
+  <audio id="soundWrong">
+    <source src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAAAAP//AAD/AAAA//8AAP8AAAD//wAA" type="audio/wav">
+  </audio>
+
+  <script>
+    // ------------------ Datos base ------------------
+    const pairs = [
+      { country: "España", problem: "Adicción al móvil" },
+      { country: "Francia", problem: "Ciberacoso" },
+      { country: "Alemania", problem: "Desinformación" },
+      { country: "Italia", problem: "Privacidad y uso de datos" },
+      { country: "Suecia", problem: "Exceso de tiempo en pantallas" },
+      { country: "Portugal", problem: "Suplantación de identidad" },
+      { country: "Bélgica", problem: "Problemas de ciberseguridad en menores" },
+      { country: "Países Bajos", problem: "Robo de datos" },
+      { country: "Polonia", problem: "Estafas digitales" },
+      { country: "Grecia", problem: "Falta de educación digital" }
+    ];
+
+    const LEVEL_EASY = "easy";
+    const LEVEL_HARD = "hard";
+
+    // ------------------ Estado global ------------------
+    let currentLevel = null;
+    let timer = 0;
+    let timerInterval = null;
+
+    // Easy level state
+    let easyRemainingPairs = [];
+    let easyVisiblePairs = [];
+    let easySelected = null; // {type: 'country'|'problem', index, pairId}
+
+    // Hard level state
+    let memoryCards = [];
+    let memoryFlipped = [];
+    let memoryLock = false;
+    let memoryMatchedCount = 0;
+
+    // DOM
+    const screenStart = document.getElementById("screenStart");
+    const screenEasy = document.getElementById("screenEasy");
+    const screenHard = document.getElementById("screenHard");
+    const timerEl = document.getElementById("timer");
+    const easyGrid = document.getElementById("easyGrid");
+    const memoryGrid = document.getElementById("memoryGrid");
+    const modalBackdrop = document.getElementById("modalBackdrop");
+    const modalContent = document.getElementById("modalContent");
+    const soundCorrect = document.getElementById("soundCorrect");
+    const soundWrong = document.getElementById("soundWrong");
+
+    const btnHome = document.getElementById("btnHome");
+    const btnRestart = document.getElementById("btnRestart");
+    const btnHardTop = document.getElementById("btnHardTop");
+    const btnEasyStart = document.getElementById("btnEasyStart");
+    const btnHardStart = document.getElementById("btnHardStart");
+
+    // ------------------ Utilidades ------------------
+    function showScreen(id) {
+      [screenStart, screenEasy, screenHard].forEach(s => s.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      timer = 0;
+      timerEl.textContent = "Tiempo: 0 s";
+    }
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      timerInterval = setInterval(() => {
+        timer++;
+        timerEl.textContent = Tiempo: ${timer} s;
+      }, 1000);
+    }
+
+    function addPenalty(seconds) {
+      timer += seconds;
+      timerEl.textContent = Tiempo: ${timer} s;
+    }
+
+    function shuffle(array) {
+      const arr = array.slice();
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function openModal(html) {
+      modalContent.innerHTML = html;
+      modalBackdrop.classList.add("active");
+    }
+
+    function closeModal() {
+      modalBackdrop.classList.remove("active");
+    }
+
+    function playCorrect() {
+      soundCorrect.currentTime = 0;
+      soundCorrect.play().catch(() => {});
+    }
+
+    function playWrong() {
+      soundWrong.currentTime = 0;
+      soundWrong.play().catch(() => {});
+    }
+
+    // ------------------ Nivel fácil ------------------
+    function initEasyLevel() {
+      currentLevel = LEVEL_EASY;
+      resetTimer();
+      startTimer();
+      easyRemainingPairs = shuffle(pairs);
+      easyVisiblePairs = [];
+      easySelected = null;
+      renderEasyGrid();
+    }
+
+    function renderEasyGrid() {
+      easyGrid.innerHTML = "";
+      // Rellenar hasta 5 parejas visibles
+      while (easyVisiblePairs.length < 5 && easyRemainingPairs.length > 0) {
+        easyVisiblePairs.push(easyRemainingPairs.shift());
+      }
+
+      if (easyVisiblePairs.length === 0) {
+        // No quedan parejas: mostrar placeholders
+        for (let i = 0; i < 10; i++) {
+          const placeholder = document.createElement("div");
+          placeholder.className = "placeholder";
+          easyGrid.appendChild(placeholder);
+        }
+        // Fin de nivel
+        clearInterval(timerInterval);
+        setTimeout(() => {
+          handleLevelFinished(LEVEL_EASY);
+        }, 400);
+        return;
+      }
+
+      // Crear arrays de países y problemas
+      const countries = easyVisiblePairs.map((p, idx) => ({
+        label: p.country,
+        pairId: idx
+      }));
+      const problems = easyVisiblePairs.map((p, idx) => ({
+        label: p.problem,
+        pairId: idx
+      }));
+
+      const shuffledCountries = shuffle(countries);
+      const shuffledProblems = shuffle(problems);
+
+      // Renderizar países
+      shuffledCountries.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "card country";
+        card.textContent = item.label;
+        card.dataset.type = "country";
+        card.dataset.pairId = item.pairId;
+        card.dataset.slot = c-${index};
+        card.addEventListener("click", () => handleEasyCardClick(card));
+        easyGrid.appendChild(card);
+      });
+
+      // Renderizar problemas
+      shuffledProblems.forEach((item, index) => {
+        const card = document.createElement("div");
+        card.className = "card problem";
+        card.textContent = item.label;
+        card.dataset.type = "problem";
+        card.dataset.pairId = item.pairId;
+        card.dataset.slot = p-${index};
+        card.addEventListener("click", () => handleEasyCardClick(card));
+        easyGrid.appendChild(card);
+      });
+    }
+
+    function handleEasyCardClick(card) {
+      if (card.classList.contains("fade-out")) return;
+
+      const type = card.dataset.type;
+      const pairId = parseInt(card.dataset.pairId, 10);
+
+      if (!easySelected) {
+        easySelected = { type, pairId, element: card };
+        card.classList.add("selected");
+        return;
+      }
+
+      if (easySelected.element === card) return;
+
+      // Segunda selección
+      card.classList.add("selected");
+
+      const isMatch = easySelected.pairId === pairId && easySelected.type !== type;
+
+      if (isMatch) {
+        // Acierto
+        playCorrect();
+        const first = easySelected.element;
+        const second = card;
+        first.classList.remove("selected");
+        second.classList.remove("selected");
+        first.classList.add("correct");
+        second.classList.add("correct");
+
+        setTimeout(() => {
+          first.classList.add("fade-out");
+          second.classList.add("fade-out");
+        }, 1000);
+
+        setTimeout(() => {
+          // Eliminar la pareja de easyVisiblePairs
+          const removedPair = easyVisiblePairs.splice(easySelected.pairId, 1)[0];
+          // Recalcular visible (simplemente volver a renderizar)
+          renderEasyGrid();
+        }, 1400);
+
+      } else {
+        // Fallo
+        playWrong();
+        const first = easySelected.element;
+        const second = card;
+        first.classList.remove("selected");
+        second.classList.remove("selected");
+        first.classList.add("wrong");
+        second.classList.add("wrong");
+        addPenalty(10);
+
+        setTimeout(() => {
+          first.classList.remove("wrong");
+          second.classList.remove("wrong");
+        }, 1000);
+      }
+
+      easySelected = null;
+    }
+
+    // ------------------ Nivel difícil (Memory) ------------------
+    function initHardLevel() {
+      currentLevel = LEVEL_HARD;
+      resetTimer();
+      startTimer();
+      memoryCards = [];
+      memoryFlipped = [];
+      memoryMatchedCount = 0;
+      memoryLock = false;
+
+      // Crear cartas: una por país y una por problema
+      let idCounter = 0;
+      pairs.forEach((p, index) => {
+        memoryCards.push({
+          id: idCounter++,
+          pairIndex: index,
+          type: "country",
+          label: p.country
+        });
+        memoryCards.push({
+          id: idCounter++,
+          pairIndex: index,
+          type: "problem",
+          label: p.problem
+        });
+      });
+
+      memoryCards = shuffle(memoryCards);
+      renderMemoryGrid();
+    }
+
+    function renderMemoryGrid() {
+      memoryGrid.innerHTML = "";
+      memoryCards.forEach(cardData => {
+        const card = document.createElement("div");
+        card.className = "memory-card";
+        card.dataset.id = cardData.id;
+        card.dataset.pairIndex = cardData.pairIndex;
+        card.dataset.type = cardData.type;
+
+        const inner = document.createElement("div");
+        inner.className = "memory-inner";
+
+        const front = document.createElement("div");
+        front.className = "memory-face memory-front";
+        front.textContent = "🧠";
+
+        const back = document.createElement("div");
+        back.className = memory-face memory-back ${cardData.type === "country" ? "country" : "problem"};
+        back.textContent = cardData.label;
+
+        inner.appendChild(front);
+        inner.appendChild(back);
+        card.appendChild(inner);
+
+        card.addEventListener("click", () => handleMemoryClick(card));
+        memoryGrid.appendChild(card);
+      });
+    }
+
+    function handleMemoryClick(card) {
+      if (memoryLock) return;
+      if (card.classList.contains("flipped") || card.classList.contains("matched")) return;
+
+      card.classList.add("flipped");
+      memoryFlipped.push(card);
+
+      if (memoryFlipped.length === 2) {
+        memoryLock = true;
+        const [c1, c2] = memoryFlipped;
+        const pair1 = parseInt(c1.dataset.pairIndex, 10);
+        const pair2 = parseInt(c2.dataset.pairIndex, 10);
+        const type1 = c1.dataset.type;
+        const type2 = c2.dataset.type;
+
+        const isMatch = pair1 === pair2 && type1 !== type2;
+
+        if (isMatch) {
+          playCorrect();
+          setTimeout(() => {
+            c1.classList.add("matched");
+            c2.classList.add("matched");
+            memoryMatchedCount++;
+            memoryFlipped = [];
+            memoryLock = false;
+
+            if (memoryMatchedCount === pairs.length) {
+              // Fin de nivel
+              clearInterval(timerInterval);
+              setTimeout(() => {
+                handleLevelFinished(LEVEL_HARD);
+              }, 400);
+            }
+          }, 600);
+        } else {
+          playWrong();
+          addPenalty(10);
+          setTimeout(() => {
+            c1.classList.remove("flipped");
+            c2.classList.remove("flipped");
+            memoryFlipped = [];
+            memoryLock = false;
+          }, 900);
+        }
+      }
+    }
+
+    // ------------------ Ranking ------------------
+    function getRankingKey(level) {
+      return level === LEVELEASY ? "rankingeasy" : "ranking_hard";
+    }
+
+    function loadRanking(level) {
+      const key = getRankingKey(level);
+      try {
+        const data = JSON.parse(localStorage.getItem(key) || "[]");
+        if (!Array.isArray(data)) return [];
+        return data;
+      } catch {
+        return [];
+      }
+    }
+
+    function saveRanking(level, list) {
+      const key = getRankingKey(level);
+      localStorage.setItem(key, JSON.stringify(list));
+    }
+
+    function addToRanking(level, name, time) {
+      const list = loadRanking(level);
+      list.push({ name, time });
+      list.sort((a, b) => a.time - b.time);
+      saveRanking(level, list);
+      return list;
+    }
+
+    function renderRankingHtml(level, list) {
+      const levelName = level === LEVEL_EASY ? "Nivel fácil" : "Nivel difícil";
+      if (!list.length) {
+        return `
+          <p>No hay registros todavía.</p>
+        `;
+      }
+      const items = list.map((item, index) => `
+        <div class="ranking-item">
+          <span class="ranking-name">${index + 1}. ${item.name || "Anónimo"}</span>
+          <span class="ranking-time">${item.time} s</span>
+        </div>
+      `).join("");
+      return `
+        <p><strong>${levelName} - Ranking de tiempos</strong></p>
+        <div class="ranking-list">
+          ${items}
+        </div>
+      `;
+    }
+
+    // ------------------ Flujo fin de nivel ------------------
+    function handleLevelFinished(level) {
+      const time = timer;
+      const levelLabel = level === LEVEL_EASY ? "nivel fácil" : "nivel difícil";
+      const askRegisterHtml = `
+        <h2>¡Has terminado el ${levelLabel}!</h2>
+        <p>Tu tiempo ha sido de <strong>${time} segundos</strong>.</p>
+        <p>¿Quieres registrar tu nombre en el ranking?</p>
+        <div class="modal-buttons">
+          <button class="btn btn-ghost" id="btnNoRegister">No</button>
+          <button class="btn btn-primary" id="btnYesRegister">Sí</button>
+        </div>
+      `;
+      openModal(askRegisterHtml);
+
+      document.getElementById("btnNoRegister").onclick = () => {
+        if (level === LEVEL_EASY) {
+          askContinueHard();
+        } else {
+          closeModal();
+        }
+      };
+
+      document.getElementById("btnYesRegister").onclick = () => {
+        showRegisterName(level, time);
+      };
+    }
+
+    function showRegisterName(level, time) {
+      const html = `
+        <h2>Registrar en el ranking</h2>
+        <p>Tiempo: <strong>${time} s</strong></p>
+        <input type="text" id="playerName" placeholder="Escribe tu nombre" />
+        <div class="modal-buttons">
+          <button class="btn btn-ghost" id="btnCancelRegister">Cancelar</button>
+          <button class="btn btn-primary" id="btnSaveRegister">Guardar</button>
+        </div>
+      `;
+      openModal(html);
+
+      document.getElementById("btnCancelRegister").onclick = () => {
+        if (level === LEVEL_EASY) {
+          askContinueHard();
+        } else {
+          closeModal();
+        }
+      };
+
+      document.getElementById("btnSaveRegister").onclick = () => {
+        const name = document.getElementById("playerName").value.trim() || "Anónimo";
+        const ranking = addToRanking(level, name, time);
+        showRanking(level, ranking);
+      };
+    }
+
+    function showRanking(level, ranking) {
+      const html = `
+        <h2>Ranking</h2>
+        ${renderRankingHtml(level, ranking)}
+        <div class="modal-buttons">
+          <button class="btn btn-primary" id="btnRankingOk">Continuar</button>
+        </div>
+      `;
+      openModal(html);
+
+      document.getElementById("btnRankingOk").onclick = () => {
+        if (level === LEVEL_EASY) {
+          askContinueHard();
+        } else {
+          closeModal();
+        }
+      };
+    }
+
+    function askContinueHard() {
+      const html = `
+        <h2>¿Continuar con el nivel difícil?</h2>
+        <p>Puedes pasar al modo Memory con todas las tarjetas boca abajo.</p>
+        <div class="modal-buttons">
+          <button class="btn btn-ghost" id="btnNoHard">No, volver al inicio</button>
+          <button class="btn btn-primary" id="btnYesHard">Sí, nivel difícil</button>
+        </div>
+      `;
+      openModal(html);
+
+      document.getElementById("btnNoHard").onclick = () => {
+        closeModal();
+        showScreen("screenStart");
+        resetTimer();
+      };
+
+      document.getElementById("btnYesHard").onclick = () => {
+        closeModal();
+        showScreen("screenHard");
+        initHardLevel();
+      };
+    }
+
+    // ------------------ Botones principales ------------------
+    btnEasyStart.addEventListener("click", () => {
+      showScreen("screenEasy");
+      initEasyLevel();
+    });
+
+    btnHardStart.addEventListener("click", () => {
+      showScreen("screenHard");
+      initHardLevel();
+    });
+
+    btnHome.addEventListener("click", () => {
+      clearInterval(timerInterval);
+      resetTimer();
+      showScreen("screenStart");
+    });
+
+    btnRestart.addEventListener("click", () => {
+      if (currentLevel === LEVEL_EASY) {
+        initEasyLevel();
+        showScreen("screenEasy");
+      } else if (currentLevel === LEVEL_HARD) {
+        initHardLevel();
+        showScreen("screenHard");
+      }
+    });
+
+    btnHardTop.addEventListener("click", () => {
+      showScreen("screenHard");
+      initHardLevel();
+    });
+
+    modalBackdrop.addEventListener("click", (e) => {
+      if (e.target === modalBackdrop) {
+        // No cerrar al hacer clic fuera para no romper el flujo
+      }
+    });
+
+    // Inicio: solo pantalla de inicio, sin temporizador
+    resetTimer();
+  </script>
+</body>
+</html>
+`
